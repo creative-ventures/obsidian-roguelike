@@ -1,6 +1,17 @@
 # Roguelike
 
 ```
+  |
+  |
+  + \
+  \.G_.*=.
+   `(#'/.\ |
+    .>' (_--.
+ _=/d   ,^\
+~~ \)-'   '
+   / |   rlc
+  '  '
+
 ╔═════════════════════════════╗
 ║    Welcome to Roguelike     ║
 ╚═════════════════════════════╝
@@ -10,27 +21,27 @@ Turn your Obsidian vault into an RPG adventure! Roguelike is a gamified goal tra
 
 ## Features
 
-### 🎮 Gamification System
+### Gamification System
 - **XP & Levels** — Earn experience points for completing goals, watch your character level up
 - **Achievements** — Unlock 15+ achievements for milestones (first task, streaks, boss defeats, etc.)
 - **Loot Drops** — Find items of various rarities (Common → Legendary) when completing goals
-- **Streaks** — Track daily completion streaks for bonus motivation
 - **Boss Goals** — Mark important milestones as "bosses" for 3x XP rewards
+- **Streaks** — Track daily completion streaks for bonus motivation
 
-### 🤖 AI-Powered Planning
+### AI-Powered Planning
 - **Goal Generation** — Describe your project, AI creates a structured task breakdown
 - **Smart Maps** — Generate ASCII dungeon maps visualizing your goal structure
 - **Charts & Diagrams** — Create ASCII schemas for any concept
 - **Content Assistant** — AI helps fill notes with relevant content
 - **Auto Headers** — Generate titles and rename files based on content
 
-### 📁 Flexible Structure
+### Flexible Structure
 - Goals are folders with companion `.md` notes containing metadata
 - Works anywhere in your vault — no dedicated folder required
 - Inline fields (Dataview-compatible) for status, deadline, boss, XP, blockers
 - Hierarchical nesting with parent-child relationships
 
-### 🎨 11 Themes
+### 11 Themes
 Choose your adventure style:
 - Default (Productivity)
 - Fantasy RPG
@@ -117,10 +128,10 @@ Short description of what needs to be done.
 ### Achievements
 
 Unlock achievements as you progress:
-- 🏆 **First Blood** — Complete your first task
-- 🔥 **On Fire** — 3-day streak
-- 👑 **Boss Slayer** — Defeat a boss
-- ⭐ **Centurion** — Complete 100 tasks
+- **First Blood** — Complete your first task
+- **On Fire** — 3-day streak
+- **Boss Slayer** — Defeat a boss
+- **Centurion** — Complete 100 tasks
 - And 10+ more!
 
 ## Settings
