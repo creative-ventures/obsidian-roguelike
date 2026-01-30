@@ -1,0 +1,11 @@
+{
+	"id": "roguelike",
+	"name": "Roguelike",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Gamified goal tracking with XP, levels, achievements, and AI-powered planning. Turn your tasks into an RPG adventure!",
+	"author": "Ruslan Krylov",
+	"authorUrl": "https://github.com/ruslankrylov",
+	"fundingUrl": "https://www.cv.rocks",
+	"isDesktopOnly": false
+}

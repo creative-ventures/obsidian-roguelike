@@ -1,0 +1,166 @@
+/* Roguelike Plugin Styles */
+
+/* ============================================
+   Modals
+   ============================================ */
+
+.rlc-modal {
+    max-width: 700px;
+}
+
+.rlc-modal h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.rlc-modal h3 {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+/* AI Input */
+.rlc-ai-input {
+    width: 100%;
+    min-height: 150px;
+    margin-bottom: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--background-modifier-border);
+    background: var(--background-primary);
+    color: var(--text-normal);
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.rlc-ai-input:focus {
+    border-color: var(--interactive-accent);
+    outline: none;
+}
+
+.rlc-modal-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+/* ============================================
+   AI Preview Modal
+   ============================================ */
+
+.rlc-ai-preview-modal,
+.rlc-ai-content-modal,
+.rlc-ai-map-modal {
+    max-width: 800px;
+}
+
+.rlc-preview-section {
+    margin-bottom: 20px;
+}
+
+.rlc-schema-preview,
+.rlc-content-preview,
+.rlc-map-preview {
+    background: var(--background-secondary);
+    border-radius: 8px;
+    padding: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.rlc-schema-tree,
+.rlc-map-content {
+    font-family: var(--font-monospace);
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre;
+}
+
+.rlc-schema-stats {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: var(--background-modifier-border);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.rlc-schema-stats span {
+    margin-right: 8px;
+}
+
+.rlc-comments-section {
+    margin-top: 20px;
+}
+
+.rlc-comments-input {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--background-modifier-border);
+    background: var(--background-primary);
+    color: var(--text-normal);
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+/* ============================================
+   Goal Modal
+   ============================================ */
+
+.rlc-goal-input {
+    border-radius: 8px;
+    border: 1px solid var(--background-modifier-border);
+    background: var(--background-primary);
+    color: var(--text-normal);
+}
+
+.rlc-goal-input:focus {
+    border-color: var(--interactive-accent);
+    outline: none;
+}
+
+/* ============================================
+   Rarity Colors
+   ============================================ */
+
+.rlc-rarity-common { color: var(--text-muted); }
+.rlc-rarity-uncommon { color: #1eff00; }
+.rlc-rarity-rare { color: #0070dd; }
+.rlc-rarity-epic { color: #a335ee; }
+.rlc-rarity-legendary { color: #ff8000; }
+
+/* ============================================
+   Settings
+   ============================================ */
+
+.rlc-hotkey-info {
+    padding: 12px;
+    background: var(--background-secondary);
+    border-radius: 8px;
+}
+
+.rlc-hotkey-info table {
+    width: 100%;
+}
+
+.rlc-hotkey-info td {
+    padding: 4px 8px;
+}
+
+.rlc-hotkey-info td:first-child {
+    width: 150px;
+}
+
+.rlc-hotkey-info code {
+    background: var(--background-modifier-border);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+}
