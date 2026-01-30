@@ -19,6 +19,10 @@
 
 Turn your Obsidian vault into an RPG adventure! Roguelike is a gamified goal tracking plugin that transforms task management into an engaging game with XP, levels, achievements, loot drops, and AI-powered planning.
 
+## Demo
+
+[Watch demo video](https://github.com/creative-ventures/obsidian-roguelike/releases/download/1.0.0/demo.mp4)
+
 ## Features
 
 ### Gamification System
