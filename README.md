@@ -187,6 +187,6 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ## Credits
 
-Created by [Ruslan Krylov](https://github.com/ruslankrylov) at [Creative Ventures](https://www.cv.rocks).
+Created by [Creative Ventures](https://www.cv.rocks).
 
 Inspired by roguelike games and the desire to make productivity feel like an adventure.
