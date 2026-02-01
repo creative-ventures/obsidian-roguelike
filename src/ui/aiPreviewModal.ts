@@ -45,11 +45,11 @@ export class AIPreviewModal extends Modal {
         contentEl.empty();
         contentEl.addClass('rlc-modal', 'rlc-ai-preview-modal');
 
-        contentEl.createEl('h2', { text: 'AI Generated Schema' });
+        contentEl.createEl('h2', { text: 'AI generated schema' });
 
         // Preview section
         const previewSection = contentEl.createDiv('rlc-preview-section');
-        previewSection.createEl('h3', { text: 'Preview' });
+        previewSection.createEl('h4', { text: 'Preview' });
         
         const previewContainer = previewSection.createDiv('rlc-schema-preview');
         previewContainer.createEl('pre', { 
@@ -66,7 +66,7 @@ export class AIPreviewModal extends Modal {
 
         // Comments section
         const commentsSection = contentEl.createDiv('rlc-comments-section');
-        commentsSection.createEl('h3', { text: 'Comments for regeneration' });
+        commentsSection.createEl('h4', { text: 'Comments for regeneration' });
         
         const textarea = commentsSection.createEl('textarea', {
             cls: 'rlc-comments-input',
@@ -79,7 +79,7 @@ export class AIPreviewModal extends Modal {
         // Buttons - Insert/Create is default (mod-cta)
         const btnContainer = contentEl.createDiv('rlc-modal-buttons');
 
-        const createBtn = btnContainer.createEl('button', { text: 'Create Goals' });
+        const createBtn = btnContainer.createEl('button', { text: 'Create goals' });
         createBtn.addClass('mod-cta');
         createBtn.onclick = () => {
             this.close();
@@ -175,11 +175,11 @@ export class AIContentPreviewModal extends Modal {
         contentEl.empty();
         contentEl.addClass('rlc-modal', 'rlc-ai-content-modal');
 
-        contentEl.createEl('h2', { text: 'AI Generated Content' });
+        contentEl.createEl('h2', { text: 'AI generated content' });
 
         // Preview section
         const previewSection = contentEl.createDiv('rlc-preview-section');
-        previewSection.createEl('h3', { text: 'Preview' });
+        previewSection.createEl('h4', { text: 'Preview' });
         
         const previewContainer = previewSection.createDiv('rlc-content-preview');
         MarkdownRenderer.render(
@@ -192,7 +192,7 @@ export class AIContentPreviewModal extends Modal {
 
         // Comments section
         const commentsSection = contentEl.createDiv('rlc-comments-section');
-        commentsSection.createEl('h3', { text: 'Comments for regeneration' });
+        commentsSection.createEl('h4', { text: 'Comments for regeneration' });
         
         const textarea = commentsSection.createEl('textarea', {
             cls: 'rlc-comments-input',
@@ -253,7 +253,7 @@ export class AIMapPreviewModal extends Modal {
         contentEl.empty();
         contentEl.addClass('rlc-modal', 'rlc-ai-map-modal');
 
-        contentEl.createEl('h2', { text: 'AI Generated' });
+        contentEl.createEl('h2', { text: 'AI generated' });
 
         // Preview section
         const previewSection = contentEl.createDiv('rlc-preview-section');
@@ -266,7 +266,7 @@ export class AIMapPreviewModal extends Modal {
 
         // Comments section
         const commentsSection = contentEl.createDiv('rlc-comments-section');
-        commentsSection.createEl('h3', { text: 'Comments for regeneration' });
+        commentsSection.createEl('h4', { text: 'Comments for regeneration' });
         
         const textarea = commentsSection.createEl('textarea', {
             cls: 'rlc-comments-input',
@@ -326,7 +326,7 @@ export class AITitlePreviewModal extends Modal {
         contentEl.empty();
         contentEl.addClass('rlc-modal');
 
-        contentEl.createEl('h2', { text: 'Generated Title' });
+        contentEl.createEl('h2', { text: 'Generated title' });
 
         // Preview
         const previewSection = contentEl.createDiv('rlc-preview-section');
@@ -337,10 +337,9 @@ export class AITitlePreviewModal extends Modal {
         commentsSection.createEl('p', { text: 'Want something different?', cls: 'setting-item-description' });
         
         const textarea = commentsSection.createEl('textarea', {
-            cls: 'rlc-comments-input',
+            cls: 'rlc-comments-input rlc-comments-input-small',
             placeholder: 'Describe what you want...'
         });
-        textarea.style.minHeight = '60px';
         textarea.addEventListener('input', () => {
             this.comments = textarea.value;
         });
@@ -404,8 +403,6 @@ export class AIPromptModal extends Modal {
             cls: 'rlc-ai-input',
             placeholder: this.placeholder
         });
-        textarea.style.width = '100%';
-        textarea.style.minHeight = '150px';
         textarea.focus();
 
         textarea.addEventListener('input', () => {

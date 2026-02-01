@@ -339,7 +339,7 @@ export class NoteService {
         if (depth >= maxDepth) return '';
         
         let result = '';
-        const children = folder.children.filter(c => c instanceof TFolder) as TFolder[];
+        const children = folder.children.filter((c): c is TFolder => c instanceof TFolder);
         
         for (let i = 0; i < children.length; i++) {
             const child = children[i];
@@ -351,8 +351,8 @@ export class NoteService {
 
             // Find goal note in folder
             const noteFile = child.children.find(
-                f => f instanceof TFile && f.extension === 'md'
-            ) as TFile | undefined;
+                (f): f is TFile => f instanceof TFile && f.extension === 'md'
+            );
 
             let displayName = child.name.replace(/^\[BOSS\]-/i, '');
             const tags: string[] = [];
@@ -476,8 +476,8 @@ export class NoteService {
         for (const child of children) {
             if (child instanceof TFolder && !child.name.startsWith('.')) {
                 const noteFile = child.children.find(
-                    f => f instanceof TFile && f.extension === 'md'
-                ) as TFile | undefined;
+                    (f): f is TFile => f instanceof TFile && f.extension === 'md'
+                );
 
                 if (noteFile) {
                     const config = await this.parseGoalNote(noteFile.path);

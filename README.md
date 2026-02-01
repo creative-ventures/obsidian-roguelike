@@ -21,7 +21,7 @@ Turn your Obsidian vault into an RPG adventure! Roguelike is a gamified goal tra
 
 ## Demo
 
-[Watch demo video](https://github.com/creative-ventures/obsidian-roguelike/releases/download/1.0.0/demo.mp4)
+https://github.com/creative-ventures/obsidian-roguelike/assets/29356955/2eed70c9-ce82-4861-84e1-ef05efc94342
 
 ## Features
 

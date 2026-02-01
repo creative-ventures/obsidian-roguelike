@@ -115,6 +115,10 @@
    ============================================ */
 
 .rlc-goal-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 16px;
+    font-size: 16px;
     border-radius: 8px;
     border: 1px solid var(--background-modifier-border);
     background: var(--background-primary);
@@ -124,6 +128,10 @@
 .rlc-goal-input:focus {
     border-color: var(--interactive-accent);
     outline: none;
+}
+
+.rlc-comments-input-small {
+    min-height: 60px;
 }
 
 /* ============================================

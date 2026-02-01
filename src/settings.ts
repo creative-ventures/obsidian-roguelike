@@ -15,7 +15,9 @@ export class RoguelikeSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl('h2', { text: 'Roguelike Settings' });
+        new Setting(containerEl)
+            .setName('Roguelike settings')
+            .setHeading();
 
         // Theme
         new Setting(containerEl)
@@ -35,7 +37,9 @@ export class RoguelikeSettingTab extends PluginSettingTab {
             });
 
         // AI Settings section
-        containerEl.createEl('h3', { text: 'AI Settings' });
+        new Setting(containerEl)
+            .setName('AI settings')
+            .setHeading();
 
         new Setting(containerEl)
             .setName('Claude API key')
@@ -66,33 +70,18 @@ export class RoguelikeSettingTab extends PluginSettingTab {
                 });
             });
 
-        // Hotkeys info
-        containerEl.createEl('h3', { text: 'Hotkeys' });
-
-        const hotkeyInfo = containerEl.createDiv('rlc-hotkey-info');
-        hotkeyInfo.innerHTML = `
-            <table>
-                <tr><td><code>Cmd+Shift+G</code></td><td>Create goal with AI</td></tr>
-                <tr><td><code>Cmd+Shift+D</code></td><td>Toggle done/undone</td></tr>
-                <tr><td><code>Cmd+Shift+B</code></td><td>Toggle boss</td></tr>
-                <tr><td><code>Cmd+Shift+M</code></td><td>Generate map</td></tr>
-                <tr><td><code>Cmd+Shift+C</code></td><td>Generate chart</td></tr>
-                <tr><td><code>Cmd+Shift+J</code></td><td>Update welcome note</td></tr>
-                <tr><td><code>Cmd+Shift+P</code></td><td>Prompt (update content)</td></tr>
-                <tr><td><code>Cmd+Shift+H</code></td><td>Generate header</td></tr>
-            </table>
-        `;
-
         // Links
-        containerEl.createEl('h3', { text: 'Links' });
+        new Setting(containerEl)
+            .setName('Links')
+            .setHeading();
         
         const linksEl = containerEl.createDiv();
-        linksEl.innerHTML = `
-            <p>
-                <a href="https://www.rlc.rocks" target="_blank">Roguelike CLI</a> | 
-                <a href="https://www.cv.rocks" target="_blank">Creative Ventures</a>
-            </p>
-        `;
+        const linkPara = linksEl.createEl('p');
+        const rlcLink = linkPara.createEl('a', { text: 'Roguelike CLI', href: 'https://www.rlc.rocks' });
+        rlcLink.setAttr('target', '_blank');
+        linkPara.appendText(' | ');
+        const cvLink = linkPara.createEl('a', { text: 'Creative Ventures', href: 'https://www.cv.rocks' });
+        cvLink.setAttr('target', '_blank');
     }
 
     private formatThemeName(theme: string): string {

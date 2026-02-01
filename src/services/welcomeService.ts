@@ -120,8 +120,8 @@ No active tasks. Use Cmd+Shift+G to create goals!
             if (child instanceof TFolder && !child.name.startsWith('.')) {
                 // Find goal note
                 const noteFile = child.children.find(
-                    f => f instanceof TFile && f.extension === 'md'
-                ) as TFile | undefined;
+                    (f): f is TFile => f instanceof TFile && f.extension === 'md'
+                );
 
                 if (noteFile) {
                     const content = await this.app.vault.read(noteFile);
@@ -262,19 +262,15 @@ speedruns:: ${profile.stats.speedruns}
 \`\`\`
 === ROGUELIKE ===
 
-Hotkeys:
-  Cmd+Shift+G       Create goal with AI
-  Cmd+Shift+D       Toggle done/undone  
-  Cmd+Shift+B       Toggle boss (3x XP)
-  Cmd+Shift+M       Generate map
-  Cmd+Shift+C       Generate chart
-  Cmd+Shift+J       Update this note
-  Cmd+Shift+P       Prompt (update content)
-  Cmd+Shift+H       Generate header
-
-Commands:
-  Create goal (manual)    Simple goal without AI
-  Create room (manual)    Subgoal without AI
+Commands (set hotkeys in Settings -> Hotkeys):
+  Create goal with AI     AI-powered goal breakdown
+  Toggle done/undone      Mark tasks complete
+  Toggle boss             Boss status (3x XP)
+  Generate map            ASCII dungeon map
+  Generate chart          ASCII diagram
+  Journal                 Update this note
+  Prompt                  Update content with AI
+  Generate header         Auto-title notes
 
 Goal Format:
   status:: open

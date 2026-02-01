@@ -14,7 +14,6 @@ import {
     AITitlePreviewModal,
     SchemaNode 
 } from './ui/aiPreviewModal';
-import { CreateGoalModal } from './ui/goalModal';
 import { RoguelikeSettingTab } from './settings';
 
 interface PluginData {
@@ -70,31 +69,22 @@ export default class RoguelikePlugin extends Plugin {
     }
 
     private registerCommands() {
-        // Create goal with AI - Cmd+Shift+G
+        // Create goal with AI
         this.addCommand({
             id: 'create-goal',
             name: 'Create goal with AI',
-            hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 'g' }],
-            callback: () => this.createGoalWithAI(),
+            callback: () => void this.createGoalWithAI(),
         });
 
-        // Create goal manually (no hotkey)
-        this.addCommand({
-            id: 'create-goal-manual',
-            name: 'Create goal (manual)',
-            callback: () => this.createGoalManual(),
-        });
-
-        // Toggle done/undone - Cmd+Shift+D
+        // Toggle done/undone
         this.addCommand({
             id: 'toggle-done',
             name: 'Toggle done/undone',
-            hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 'd' }],
             checkCallback: (checking) => {
                 const activeFile = this.app.workspace.getActiveFile();
                 if (activeFile && activeFile.extension === 'md') {
                     if (!checking) {
-                        this.toggleGoalDone();
+                        void this.toggleGoalDone();
                     }
                     return true;
                 }
@@ -102,16 +92,15 @@ export default class RoguelikePlugin extends Plugin {
             },
         });
 
-        // Toggle boss - Cmd+Shift+B
+        // Toggle boss
         this.addCommand({
             id: 'toggle-boss',
             name: 'Toggle boss',
-            hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 'b' }],
             checkCallback: (checking) => {
                 const activeFile = this.app.workspace.getActiveFile();
                 if (activeFile && activeFile.extension === 'md') {
                     if (!checking) {
-                        this.toggleGoalBoss();
+                        void this.toggleGoalBoss();
                     }
                     return true;
                 }
@@ -119,16 +108,15 @@ export default class RoguelikePlugin extends Plugin {
             },
         });
 
-        // Generate map - Cmd+Shift+M
+        // Generate map
         this.addCommand({
             id: 'generate-map',
             name: 'Generate map',
-            hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 'm' }],
             checkCallback: (checking) => {
                 const activeFile = this.app.workspace.getActiveFile();
                 if (activeFile && activeFile.extension === 'md') {
                     if (!checking) {
-                        this.generateMap();
+                        void this.generateMap();
                     }
                     return true;
                 }
@@ -136,16 +124,15 @@ export default class RoguelikePlugin extends Plugin {
             },
         });
 
-        // Generate chart/schema - Cmd+Shift+C
+        // Generate chart/schema
         this.addCommand({
             id: 'generate-chart',
             name: 'Generate chart',
-            hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 'c' }],
             checkCallback: (checking) => {
                 const activeFile = this.app.workspace.getActiveFile();
                 if (activeFile && activeFile.extension === 'md') {
                     if (!checking) {
-                        this.generateChart();
+                        void this.generateChart();
                     }
                     return true;
                 }
@@ -153,11 +140,10 @@ export default class RoguelikePlugin extends Plugin {
             },
         });
 
-        // Journal (update welcome note) - Cmd+Shift+J
+        // Journal (update welcome note)
         this.addCommand({
             id: 'journal',
             name: 'Journal (update welcome note)',
-            hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 'j' }],
             callback: async () => {
                 await this.updateWelcomeNote();
                 await this.openWelcomeNote();
@@ -165,16 +151,15 @@ export default class RoguelikePlugin extends Plugin {
             },
         });
 
-        // Prompt (update note content) - Cmd+Shift+P
+        // Prompt (update note content)
         this.addCommand({
             id: 'prompt',
             name: 'Prompt (update note content)',
-            hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 'p' }],
             checkCallback: (checking) => {
                 const activeFile = this.app.workspace.getActiveFile();
                 if (activeFile && activeFile.extension === 'md') {
                     if (!checking) {
-                        this.promptNoteContent();
+                        void this.promptNoteContent();
                     }
                     return true;
                 }
@@ -182,35 +167,27 @@ export default class RoguelikePlugin extends Plugin {
             },
         });
 
-        // Generate header - Cmd+Shift+H
+        // Generate header
         this.addCommand({
             id: 'generate-header',
             name: 'Generate header',
-            hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 'h' }],
             checkCallback: (checking) => {
                 const activeFile = this.app.workspace.getActiveFile();
                 if (activeFile && activeFile.extension === 'md') {
                     if (!checking) {
-                        this.generateHeader();
+                        void this.generateHeader();
                     }
                     return true;
                 }
                 return false;
             },
-        });
-
-        // Create room manually
-        this.addCommand({
-            id: 'create-room-manual',
-            name: 'Create room (manual)',
-            callback: () => this.createRoomManual(),
         });
 
         // Open welcome note
         this.addCommand({
             id: 'open-welcome',
             name: 'Open welcome note',
-            callback: () => this.openWelcomeNote(),
+            callback: () => void this.openWelcomeNote(),
         });
     }
 
@@ -225,7 +202,7 @@ export default class RoguelikePlugin extends Plugin {
 
         const promptResult = await this.showPromptModal(
             'Create goal with AI',
-            'Describe your goal, subtasks, deadlines, dependencies...'
+            'Short goal or topic (e.g. "Launch blog", "Q1 review")'
         );
         if (!promptResult) return;
 
@@ -233,47 +210,6 @@ export default class RoguelikePlugin extends Plugin {
         const treeContext = await this.noteService.getGoalTreeForContext(currentPath);
 
         await this.generateAndCreateGoals(promptResult.prompt, currentPath, treeContext);
-    }
-
-    // Create goal manually
-    private async createGoalManual() {
-        const currentPath = this.noteService.getCurrentFolderPath();
-
-        new CreateGoalModal(this.app, async (name) => {
-            try {
-                const { notePath } = await this.noteService.createGoalWithNote(currentPath, name);
-
-                new Notice(`Goal "${name}" created!`);
-                
-                const file = this.app.vault.getAbstractFileByPath(notePath);
-                if (file instanceof TFile) {
-                    await this.app.workspace.getLeaf().openFile(file);
-                }
-            } catch (error) {
-                new Notice(`Error creating goal: ${error}`);
-            }
-        }).open();
-    }
-
-    // Create room manually
-    private async createRoomManual() {
-        const activeFile = this.app.workspace.getActiveFile();
-        const parentPath = activeFile?.parent?.path || '';
-
-        new CreateGoalModal(this.app, async (name) => {
-            try {
-                const { notePath } = await this.noteService.createGoalWithNote(parentPath, name);
-
-                new Notice(`Room "${name}" created!`);
-                
-                const file = this.app.vault.getAbstractFileByPath(notePath);
-                if (file instanceof TFile) {
-                    await this.app.workspace.getLeaf().openFile(file);
-                }
-            } catch (error) {
-                new Notice(`Error creating room: ${error}`);
-            }
-        }).open();
     }
 
     // Toggle goal done/undone
@@ -344,7 +280,7 @@ export default class RoguelikePlugin extends Plugin {
             }
 
         } catch (error) {
-            new Notice(`Error: ${error}`);
+            new Notice(`Error: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 
@@ -367,12 +303,12 @@ export default class RoguelikePlugin extends Plugin {
             }
 
             const message = result.isBoss 
-                ? 'Marked as BOSS (3x XP)' 
-                : 'Removed BOSS status';
+                ? 'Marked as boss (3x XP)' 
+                : 'Removed boss status';
             new Notice(message);
 
         } catch (error) {
-            new Notice(`Error: ${error}`);
+            new Notice(`Error: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 
@@ -425,7 +361,7 @@ export default class RoguelikePlugin extends Plugin {
             }
 
         } catch (error) {
-            new Notice(`Error generating map: ${error}`);
+            new Notice(`Error generating map: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 
@@ -473,7 +409,7 @@ export default class RoguelikePlugin extends Plugin {
             }
 
         } catch (error) {
-            new Notice(`Error generating chart: ${error}`);
+            new Notice(`Error generating chart: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 
@@ -549,7 +485,7 @@ Write concise, actionable content in markdown format.`;
             }
 
         } catch (error) {
-            new Notice(`Error: ${error}`);
+            new Notice(`Error: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 
@@ -632,7 +568,7 @@ Write concise, actionable content in markdown format.`;
             }
 
         } catch (error) {
-            new Notice(`Error: ${error}`);
+            new Notice(`Error: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 
@@ -646,7 +582,7 @@ Write concise, actionable content in markdown format.`;
         while (true) {
             const result = await this.aiService.generateSchema(currentPrompt, treeContext);
             if (!result.success || !result.schema) {
-                new Notice(`Error: ${result.error}`);
+                new Notice(`Error: ${result.error ?? 'Unknown error'}`);
                 return;
             }
 
@@ -760,7 +696,7 @@ Write concise, actionable content in markdown format.`;
     }
 
     updateTheme() {
-        this.updateWelcomeNote();
+        void this.updateWelcomeNote();
     }
 
     updateAIConfig() {

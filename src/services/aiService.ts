@@ -47,34 +47,21 @@ export class AIService {
                 contextInfo = `\n\nExisting tasks in this folder (DO NOT duplicate these):\n${existingContext}`;
             }
 
-            const systemPrompt = `You are a task breakdown assistant. Given a goal or project description, generate a hierarchical task structure.
+            const systemPrompt = `You are a task breakdown assistant. Output a SHORT hierarchical task list.
 
-Respond ONLY with valid JSON in this exact format:
-{
-  "name": "Main Goal",
-  "children": [
-    {
-      "name": "Subtask 1",
-      "isBoss": false,
-      "description": "Optional description",
-      "deadline": "2026-02-15",
-      "blockers": ["Task that blocks this"],
-      "children": [...]
-    }
-  ]
-}
+JSON format (omit description, deadline, blockers if empty):
+{"name": "Goal", "children": [{"name": "Step 1", "isBoss": false, "children": []}]}
 
 Rules:
-- KEEP IT SHORT: max 5-7 tasks total, prefer fewer
-- Break down the goal into actionable subtasks
-- Use "isBoss": true for major milestones (1 per structure max)
-- Keep task names concise (3-5 words)
-- Nest tasks logically (max 2 levels deep)
-- Each task can have 0-3 children max
-- Add deadlines if user mentions them (format: YYYY-MM-DD)
-- Add blockers as array of task names that must be done first
-- Respond with ONLY the JSON, no explanations
-- DO NOT duplicate existing tasks from context${contextInfo}`;
+- VERY SHORT: max 3-5 tasks total. Prefer 3.
+- Task names: 2-4 words only. No sentences.
+- No "description" field unless critical.
+- "isBoss": true for one main milestone only.
+- Max 2 levels deep, max 2 children per task.
+- Deadlines only if user explicitly asks (YYYY-MM-DD).
+- Blockers only if user mentions dependencies.
+- Output ONLY valid JSON, no text before or after.
+- DO NOT duplicate existing tasks from context.${contextInfo}`;
 
             const response = await requestUrl({
                 url: 'https://api.anthropic.com/v1/messages',
@@ -128,10 +115,10 @@ Rules:
                 success: true,
                 schema,
             };
-        } catch (error) {
+        } catch (error: unknown) {
             return {
                 success: false,
-                error: error instanceof Error ? error.message : 'Unknown error',
+                error: error instanceof Error ? error.message : String(error),
             };
         }
     }
