@@ -262,15 +262,15 @@ speedruns:: ${profile.stats.speedruns}
 \`\`\`
 === ROGUELIKE ===
 
-Commands (set hotkeys in Settings -> Hotkeys):
-  Create goal with AI     AI-powered goal breakdown
-  Toggle done/undone      Mark tasks complete
-  Toggle boss             Boss status (3x XP)
-  Generate map            ASCII dungeon map
-  Generate chart          ASCII diagram
-  Journal                 Update this note
-  Prompt                  Update content with AI
-  Generate header         Auto-title notes
+Recommended hotkeys (assign in Settings → Hotkeys, search "Roguelike"):
+  Cmd+Shift+G  /  Ctrl+Alt+Cmd+G    Create goal with AI
+  Cmd+Shift+D  /  Ctrl+Alt+Cmd+D    Toggle done/undone
+  Cmd+Shift+B  /  Ctrl+Alt+Cmd+B    Toggle boss (3x XP)
+  Cmd+Shift+M  /  Ctrl+Alt+Cmd+M    Generate map
+  Cmd+Shift+C  /  Ctrl+Alt+Cmd+C    Generate chart
+  Cmd+Shift+J  /  Ctrl+Alt+Cmd+J    Journal (update this note)
+  Cmd+Shift+P  /  Ctrl+Alt+Cmd+P    Prompt (update content with AI)
+  Cmd+Shift+H  /  Ctrl+Alt+Cmd+H    Generate header
 
 Goal Format:
   status:: open

@@ -159,9 +159,46 @@ export type ThemeName =
     | 'crusader' 
     | 'darksouls';
 
+// AI provider
+export type AiProvider = 'anthropic' | 'openai' | 'google' | 'xai';
+
+// Provider → model IDs (value) and display labels
+export const AI_PROVIDER_MODELS: Record<AiProvider, Array<{ id: string; label: string }>> = {
+    anthropic: [
+        { id: 'claude-sonnet-4-20250514', label: 'Claude sonnet 4' },
+        { id: 'claude-opus-4-20250514', label: 'Claude opus 4' },
+        { id: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 sonnet' },
+    ],
+    openai: [
+        { id: 'gpt-4o', label: 'GPT-4o' },
+        { id: 'gpt-4o-mini', label: 'GPT-4o mini' },
+        { id: 'gpt-4-turbo', label: 'GPT-4 turbo' },
+        { id: 'gpt-4o-2024-11-20', label: 'GPT-4o (Nov 2024)' },
+        { id: 'o1', label: 'O1' },
+        { id: 'o1-mini', label: 'O1 mini' },
+    ],
+    google: [
+        { id: 'gemini-1.5-pro', label: 'Gemini 1.5 pro' },
+        { id: 'gemini-1.5-flash', label: 'Gemini 1.5 flash' },
+        { id: 'gemini-1.0-pro', label: 'Gemini 1.0 pro' },
+    ],
+    xai: [
+        { id: 'grok-2', label: 'Grok 2' },
+        { id: 'grok-2-mini', label: 'Grok 2 mini' },
+    ],
+};
+
+export const AI_PROVIDER_LABELS: Record<AiProvider, string> = {
+    anthropic: 'Anthropic (Claude)',
+    openai: 'OpenAI (GPT)',
+    google: 'Google (Gemini)',
+    xai: 'xAI (Grok)',
+};
+
 // Plugin settings
 export interface RoguelikeSettings {
     theme: ThemeName;
+    aiProvider: AiProvider;
     aiApiKey: string;
     aiModel: string;
 }
@@ -169,6 +206,7 @@ export interface RoguelikeSettings {
 // Default settings
 export const DEFAULT_SETTINGS: RoguelikeSettings = {
     theme: 'default',
+    aiProvider: 'anthropic',
     aiApiKey: '',
     aiModel: 'claude-sonnet-4-20250514',
 };

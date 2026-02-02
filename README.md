@@ -74,21 +74,20 @@ Choose your adventure style:
 
 ## Hotkeys
 
-| Hotkey | Command | Description |
-|--------|---------|-------------|
-| `Cmd+Shift+G` | Create goal with AI | Describe a goal, AI generates task structure |
-| `Cmd+Shift+D` | Toggle done/undone | Mark goal complete or revert completion |
-| `Cmd+Shift+B` | Toggle boss | Mark/unmark as boss goal (3x XP) |
-| `Cmd+Shift+M` | Generate map | AI creates ASCII dungeon map of goal structure |
-| `Cmd+Shift+C` | Generate chart | AI creates ASCII diagram from prompt |
-| `Cmd+Shift+J` | Journal | Update welcome note with current stats and task overview |
-| `Cmd+Shift+P` | Prompt | AI updates/adds content to current note |
-| `Cmd+Shift+H` | Generate header | AI generates H1 title and renames file |
+The plugin does **not** set default hotkeys (to avoid conflicts). You can assign **recommended** shortcuts in **Settings → Hotkeys** (search for "Roguelike"):
 
-### Additional Commands (Command Palette)
-- **Create goal (manual)** — Create a goal folder without AI
-- **Create room (manual)** — Create a subgoal/subtask manually
-- **Create room with AI** — AI generates subtasks for current goal
+| Recommended shortcut | Command | Description |
+|----------------------|---------|-------------|
+| **Mac:** `Cmd+Shift+G` / **Win:** `Ctrl+Alt+Cmd+G` | Create goal with AI | Describe a goal, AI generates task structure |
+| **Mac:** `Cmd+Shift+D` / **Win:** `Ctrl+Alt+Cmd+D` | Toggle done/undone | Mark goal complete or revert completion |
+| **Mac:** `Cmd+Shift+B` / **Win:** `Ctrl+Alt+Cmd+B` | Toggle boss | Mark/unmark as boss goal (3x XP) |
+| **Mac:** `Cmd+Shift+M` / **Win:** `Ctrl+Alt+Cmd+M` | Generate map | AI creates ASCII dungeon map of goal structure |
+| **Mac:** `Cmd+Shift+C` / **Win:** `Ctrl+Alt+Cmd+C` | Generate chart | AI creates ASCII diagram from prompt |
+| **Mac:** `Cmd+Shift+J` / **Win:** `Ctrl+Alt+Cmd+J` | Journal | Update welcome note with current stats and task overview |
+| **Mac:** `Cmd+Shift+P` / **Win:** `Ctrl+Alt+Cmd+P` | Prompt | AI updates/adds content to current note |
+| **Mac:** `Cmd+Shift+H` / **Win:** `Ctrl+Alt+Cmd+H` | Generate header | AI generates H1 title and renames file |
+
+**How to assign:** Open **Settings → Hotkeys**, type "Roguelike" in the search box, click the pencil next to a command, then press your desired key combination.
 
 ## How It Works
 
@@ -143,8 +142,18 @@ Unlock achievements as you progress:
 | Setting | Description |
 |---------|-------------|
 | **Theme** | Visual theme for messages and item names |
-| **Claude API Key** | Required for AI features (get at [console.anthropic.com](https://console.anthropic.com)) |
-| **AI Model** | Claude model selection (claude-sonnet-4-20250514 recommended) |
+| **Provider** | AI provider for goals, maps, content, and headers |
+| **Model** | Model to use (depends on selected provider) |
+| **API key** | API key for the selected provider (get it from the provider’s console) |
+
+### AI providers and models
+
+| Provider | Models | API key / docs |
+|----------|--------|----------------|
+| **Anthropic (Claude)** | Claude sonnet 4, Claude opus 4, Claude 3.5 sonnet | [console.anthropic.com](https://console.anthropic.com) |
+| **OpenAI (GPT)** | GPT-4o, GPT-4o mini, GPT-4 turbo, GPT-4o (Nov 2024), O1, O1 mini | [platform.openai.com](https://platform.openai.com/api-keys) |
+| **Google (Gemini)** | Gemini 1.5 pro, Gemini 1.5 flash, Gemini 1.0 pro | [aistudio.google.com](https://aistudio.google.com/app/apikey) |
+| **xAI (Grok)** | Grok 2, Grok 2 mini | [console.x.ai](https://console.x.ai) |
 
 ## Welcome Note
 
@@ -156,7 +165,7 @@ On first run, the plugin creates a `Welcome to Roguelike.md` note in your vault 
 - Journal with task overview (overdue, upcoming, blocked)
 - Help and hotkey reference
 
-Use `Cmd+Shift+J` to update this note anytime.
+Assign a hotkey for **Journal** in **Settings → Hotkeys** (e.g. `Cmd+Shift+J` / `Ctrl+Alt+Cmd+J`) to update this note anytime.
 
 ## Development
 

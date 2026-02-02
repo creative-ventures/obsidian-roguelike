@@ -50,7 +50,7 @@ export default class RoguelikePlugin extends Plugin {
                 }
             }
         );
-        this.aiService = new AIService(this.settings.aiApiKey, this.settings.aiModel);
+        this.aiService = new AIService(this.settings.aiProvider, this.settings.aiApiKey, this.settings.aiModel);
 
         // Register commands
         this.registerCommands();
@@ -700,7 +700,7 @@ Write concise, actionable content in markdown format.`;
     }
 
     updateAIConfig() {
-        this.aiService.updateConfig(this.settings.aiApiKey, this.settings.aiModel);
+        this.aiService.updateConfig(this.settings.aiProvider, this.settings.aiApiKey, this.settings.aiModel);
     }
 
     getProfile(): Profile {

@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
 import type RoguelikePlugin from './main';
-import { ThemeName } from './types';
+import { ThemeName, AiProvider, AI_PROVIDER_LABELS, AI_PROVIDER_MODELS } from './types';
 import { getAvailableThemes } from './data/dictionaries';
 
 export class RoguelikeSettingTab extends PluginSettingTab {
@@ -40,8 +40,48 @@ export class RoguelikeSettingTab extends PluginSettingTab {
             .setHeading();
 
         new Setting(containerEl)
-            .setName('Claude API key')
-            .setDesc('API key for AI-powered features')
+            .setName('Provider')
+            .setDesc('AI provider for goals, maps, content, and headers')
+            .addDropdown((dropdown) => {
+                const providers: AiProvider[] = ['anthropic', 'openai', 'google', 'xai'];
+                for (const p of providers) {
+                    dropdown.addOption(p, AI_PROVIDER_LABELS[p]);
+                }
+                dropdown.setValue(this.plugin.settings.aiProvider);
+                dropdown.onChange((value) => {
+                    const provider = value as AiProvider;
+                    this.plugin.settings.aiProvider = provider;
+                    const models = AI_PROVIDER_MODELS[provider];
+                    const currentInList = models.some((m) => m.id === this.plugin.settings.aiModel);
+                    const firstModel = models[0];
+                    if (!currentInList && firstModel) {
+                        this.plugin.settings.aiModel = firstModel.id;
+                    }
+                    void this.plugin.saveSettings().then(() => {
+                        this.plugin.updateAIConfig();
+                        this.display();
+                    });
+                });
+            });
+
+        new Setting(containerEl)
+            .setName('Model')
+            .setDesc('Model to use for the selected provider')
+            .addDropdown((dropdown) => {
+                const models = AI_PROVIDER_MODELS[this.plugin.settings.aiProvider];
+                for (const m of models) {
+                    dropdown.addOption(m.id, m.label);
+                }
+                dropdown.setValue(this.plugin.settings.aiModel);
+                dropdown.onChange((value) => {
+                    this.plugin.settings.aiModel = value;
+                    void this.plugin.saveSettings().then(() => this.plugin.updateAIConfig());
+                });
+            });
+
+        new Setting(containerEl)
+            .setName('API key')
+            .setDesc('API key for the selected provider (get it from the provider’s console)')
             .addText((text) =>
                 text
                     .setPlaceholder('Paste your API key here')
@@ -51,20 +91,6 @@ export class RoguelikeSettingTab extends PluginSettingTab {
                         void this.plugin.saveSettings().then(() => this.plugin.updateAIConfig());
                     })
             );
-
-        new Setting(containerEl)
-            .setName('AI model')
-            .setDesc('Claude model to use')
-            .addDropdown((dropdown) => {
-                dropdown.addOption('claude-sonnet-4-20250514', 'Claude sonnet 4');
-                dropdown.addOption('claude-opus-4-20250514', 'Claude opus 4');
-                dropdown.addOption('claude-3-5-sonnet-20241022', 'Claude 3.5 sonnet');
-                dropdown.setValue(this.plugin.settings.aiModel);
-                dropdown.onChange((value) => {
-                    this.plugin.settings.aiModel = value;
-                    void this.plugin.saveSettings().then(() => this.plugin.updateAIConfig());
-                });
-            });
 
         // Links
         new Setting(containerEl)

@@ -1,6 +1,7 @@
 import { requestUrl } from 'obsidian';
+import type { AiProvider } from '../types';
 
-// Anthropic API response shape
+// Response shapes per provider
 interface AnthropicContentBlock {
     type: string;
     text?: string;
@@ -9,9 +10,38 @@ interface AnthropicResponse {
     content?: AnthropicContentBlock[];
 }
 
-function getResponseText(data: unknown): string | undefined {
-    const r = data as AnthropicResponse;
-    return r.content?.[0]?.text;
+interface OpenAIMessage {
+    role: string;
+    content?: string;
+}
+interface OpenAIResponse {
+    choices?: Array<{ message?: OpenAIMessage }>;
+}
+
+interface GeminiPart {
+    text?: string;
+}
+interface GeminiCandidate {
+    content?: { parts?: GeminiPart[] };
+}
+interface GeminiResponse {
+    candidates?: GeminiCandidate[];
+}
+
+function getResponseText(provider: AiProvider, data: unknown): string | undefined {
+    if (provider === 'anthropic') {
+        const r = data as AnthropicResponse;
+        return r.content?.[0]?.text;
+    }
+    if (provider === 'openai' || provider === 'xai') {
+        const r = data as OpenAIResponse;
+        return r.choices?.[0]?.message?.content;
+    }
+    if (provider === 'google') {
+        const r = data as GeminiResponse;
+        return r.candidates?.[0]?.content?.parts?.[0]?.text;
+    }
+    return undefined;
 }
 
 export interface SchemaNode {
@@ -30,21 +60,110 @@ export interface GenerationResult {
 }
 
 export class AIService {
+    private provider: AiProvider;
     private apiKey: string;
     private model: string;
 
-    constructor(apiKey: string, model: string) {
+    constructor(provider: AiProvider, apiKey: string, model: string) {
+        this.provider = provider;
         this.apiKey = apiKey;
         this.model = model;
     }
 
-    updateConfig(apiKey: string, model: string) {
+    updateConfig(provider: AiProvider, apiKey: string, model: string) {
+        this.provider = provider;
         this.apiKey = apiKey;
         this.model = model;
     }
 
     isConfigured(): boolean {
         return !!this.apiKey;
+    }
+
+    private async postChat(systemPrompt: string | null, userContent: string): Promise<string> {
+        const maxTokens = 4096;
+
+        if (this.provider === 'anthropic') {
+            const content = systemPrompt
+                ? `${systemPrompt}\n\n${userContent}`
+                : userContent;
+            const response = await requestUrl({
+                url: 'https://api.anthropic.com/v1/messages',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': this.apiKey,
+                    'anthropic-version': '2023-06-01',
+                },
+                body: JSON.stringify({
+                    model: this.model,
+                    max_tokens: maxTokens,
+                    messages: [{ role: 'user', content }],
+                }),
+            });
+            if (response.status !== 200) {
+                throw new Error(`API error: ${response.status}`);
+            }
+            const text = getResponseText('anthropic', response.json);
+            if (!text || typeof text !== 'string') throw new Error('Empty response from API');
+            return text;
+        }
+
+        if (this.provider === 'openai' || this.provider === 'xai') {
+            const url = this.provider === 'openai'
+                ? 'https://api.openai.com/v1/chat/completions'
+                : 'https://api.x.ai/v1/chat/completions';
+            const messages: Array<{ role: string; content: string }> = [];
+            if (systemPrompt) {
+                messages.push({ role: 'system', content: systemPrompt });
+            }
+            messages.push({ role: 'user', content: userContent });
+            const response = await requestUrl({
+                url,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.apiKey}`,
+                },
+                body: JSON.stringify({
+                    model: this.model,
+                    max_tokens: maxTokens,
+                    messages,
+                }),
+            });
+            if (response.status !== 200) {
+                throw new Error(`API error: ${response.status}`);
+            }
+            const text = getResponseText(this.provider, response.json);
+            if (!text || typeof text !== 'string') throw new Error('Empty response from API');
+            return text;
+        }
+
+        if (this.provider === 'google') {
+            const userPart = systemPrompt
+                ? `${systemPrompt}\n\n${userContent}`
+                : userContent;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${encodeURIComponent(this.apiKey)}`;
+            const response = await requestUrl({
+                url,
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ role: 'user', parts: [{ text: userPart }] }],
+                    generationConfig: {
+                        maxOutputTokens: maxTokens,
+                    },
+                }),
+            });
+            if (response.status !== 200) {
+                throw new Error(`API error: ${response.status}`);
+            }
+            const text = getResponseText('google', response.json);
+            if (!text || typeof text !== 'string') throw new Error('Empty response from API');
+            return text;
+        }
+
+        throw new Error('Unknown AI provider');
     }
 
     async generateSchema(prompt: string, existingContext?: string): Promise<GenerationResult> {
@@ -77,43 +196,9 @@ Rules:
 - Output ONLY valid JSON, no text before or after.
 - DO NOT duplicate existing tasks from context.${contextInfo}`;
 
-            const response = await requestUrl({
-                url: 'https://api.anthropic.com/v1/messages',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': this.apiKey,
-                    'anthropic-version': '2023-06-01',
-                },
-                body: JSON.stringify({
-                    model: this.model,
-                    max_tokens: 4096,
-                    messages: [
-                        {
-                            role: 'user',
-                            content: `${systemPrompt}\n\nGoal to break down:\n${prompt}`,
-                        },
-                    ],
-                }),
-            });
+            const userContent = `Goal to break down:\n${prompt}`;
+            const content = await this.postChat(systemPrompt, userContent);
 
-            if (response.status !== 200) {
-                return {
-                    success: false,
-                    error: `API error: ${response.status}`,
-                };
-            }
-
-            const content = getResponseText(response.json);
-
-            if (!content || typeof content !== 'string') {
-                return {
-                    success: false,
-                    error: 'Empty response from API',
-                };
-            }
-
-            // Parse JSON from response
             const jsonMatch = content.match(/\{[\s\S]*\}/);
             if (!jsonMatch || !jsonMatch[0]) {
                 return {
@@ -136,7 +221,6 @@ Rules:
         }
     }
 
-    // Generate content for filling notes
     async generateContent(prompt: string, existingContent?: string): Promise<string> {
         if (!this.apiKey) {
             throw new Error('API key not configured');
@@ -147,40 +231,9 @@ Rules:
             systemContext += `\n\nExisting note content for context:\n${existingContent}`;
         }
 
-        const response = await requestUrl({
-            url: 'https://api.anthropic.com/v1/messages',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': this.apiKey,
-                'anthropic-version': '2023-06-01',
-            },
-            body: JSON.stringify({
-                model: this.model,
-                max_tokens: 4096,
-                messages: [
-                    {
-                        role: 'user',
-                        content: systemContext,
-                    },
-                ],
-            }),
-        });
-
-        if (response.status !== 200) {
-            throw new Error(`API error: ${response.status}`);
-        }
-
-        const content = getResponseText(response.json);
-
-        if (!content || typeof content !== 'string') {
-            throw new Error('Empty response from API');
-        }
-
-        return content;
+        return this.postChat(null, systemContext);
     }
 
-    // Generate dungeon map ASCII art (game-like style)
     async generateMap(treeContent: string): Promise<string> {
         if (!this.apiKey) {
             throw new Error('API key not configured');
@@ -209,66 +262,13 @@ x completed [DONE]
 ♦ treasure/loot
 ≈ water/hazard
 
-EXAMPLE:
-\`\`\`
-██████████████████████████████████████████████████████
-█░░░░░░░░░░░░░█░░░░░░░░░░░░░░░░░░░█░░░░░░░░░░░░░░░░░░█
-█░[Planning]░░█░░░░[Development]░░█░░░[Testing]░░░░░█
-█░ * Research░+░░░ * Backend░░░░░+░░░ * Unit tests░░█
-█░ x Analysis░█░░░ * Frontend░░░░█░░░ * E2E tests░░░█
-█░░░░░░░░░░░░░█░░░ @ Deploy [BOSS]█░░░░░░░░░░░░░░░░░█
-██████████+███████████████████████████████+██████████
-          ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-██████████+█████████████████████████████████████████
-█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█
-█░░░░░░░░░░░░[Launch Zone]░░░░░░░░░░░░░░░░░░░░░░░░░█
-█░░░░░░░░░░░░ @ SHIP IT! [BOSS]░░░░░░░░░░░░♦░░░░░░░█
-█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█
-████████████████████████████████████████████████████
-
-Legend: * Task  x Done  @ Boss  ♦ Loot  + Door
-\`\`\`
-
 Make the map INTERESTING and GAME-LIKE. Use creativity!
 Respond with ONLY the ASCII art, no explanations.`;
 
-        const response = await requestUrl({
-            url: 'https://api.anthropic.com/v1/messages',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': this.apiKey,
-                'anthropic-version': '2023-06-01',
-            },
-            body: JSON.stringify({
-                model: this.model,
-                max_tokens: 4096,
-                messages: [
-                    {
-                        role: 'user',
-                        content: `${systemPrompt}\n\nTask tree:\n${treeContent}`,
-                    },
-                ],
-            }),
-        });
-
-        if (response.status !== 200) {
-            throw new Error(`API error: ${response.status}`);
-        }
-
-        const content = getResponseText(response.json);
-
-        if (!content || typeof content !== 'string') {
-            throw new Error('Empty response from API');
-        }
-
-        // Extract just the ASCII art (remove any markdown code blocks)
-        const map = content.replace(/```[a-z]*\n?/gi, '').replace(/```/g, '').trim();
-        
-        return map;
+        const content = await this.postChat(systemPrompt, `Task tree:\n${treeContent}`);
+        return content.replace(/```[a-z]*\n?/gi, '').replace(/```/g, '').trim();
     }
 
-    // Generate chart/schema ASCII art (narrow)
     async generateChart(prompt: string): Promise<string> {
         if (!this.apiKey) {
             throw new Error('API key not configured');
@@ -283,112 +283,23 @@ Use box-drawing characters and symbols:
 → ← ↑ ↓ for arrows
 * + - for bullet points
 
-Keep it:
-- MAX WIDTH: 50 characters
-- Vertical layout preferred
-- Clear and readable
-- No unnecessary decoration
-
-Example (notice narrow width):
-\`\`\`
-┌─────────────────┐
-│     Input       │
-└────────┬────────┘
-         │
-         ↓
-┌─────────────────┐
-│    Process      │
-└────────┬────────┘
-         │
-         ↓
-┌─────────────────┐
-│     Output      │
-└─────────────────┘
-\`\`\`
-
-Create a NARROW chart (max 50 chars wide).
+Keep it: MAX WIDTH 50 characters, vertical layout preferred, clear and readable.
 Respond with ONLY the ASCII art, no explanations.`;
 
-        const response = await requestUrl({
-            url: 'https://api.anthropic.com/v1/messages',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': this.apiKey,
-                'anthropic-version': '2023-06-01',
-            },
-            body: JSON.stringify({
-                model: this.model,
-                max_tokens: 4096,
-                messages: [
-                    {
-                        role: 'user',
-                        content: `${systemPrompt}\n\nCreate a chart for:\n${prompt}`,
-                    },
-                ],
-            }),
-        });
-
-        if (response.status !== 200) {
-            throw new Error(`API error: ${response.status}`);
-        }
-
-        const content = getResponseText(response.json);
-
-        if (!content || typeof content !== 'string') {
-            throw new Error('Empty response from API');
-        }
-
-        // Extract just the ASCII art
-        const chart = content.replace(/```[a-z]*\n?/gi, '').replace(/```/g, '').trim();
-        
-        return chart;
+        const content = await this.postChat(systemPrompt, `Create a chart for:\n${prompt}`);
+        return content.replace(/```[a-z]*\n?/gi, '').replace(/```/g, '').trim();
     }
 
-    // Generate title for note or selected text
     async generateTitle(content: string, isSelectedText: boolean): Promise<string> {
         if (!this.apiKey) {
             throw new Error('API key not configured');
         }
 
-        const systemPrompt = isSelectedText 
-            ? `Generate a SHORT, descriptive heading (3-7 words) for the following text. 
-               The heading should summarize the main topic.
-               Respond with ONLY the heading text, no markdown, no #, just plain text.`
-            : `Generate a SHORT, descriptive title (3-7 words) for this note based on its content.
-               The title should capture the main topic.
-               Respond with ONLY the title text, no markdown, no #, just plain text.`;
+        const systemPrompt = isSelectedText
+            ? `Generate a SHORT, descriptive heading (3-7 words) for the following text. The heading should summarize the main topic. Respond with ONLY the heading text, no markdown, no #, just plain text.`
+            : `Generate a SHORT, descriptive title (3-7 words) for this note based on its content. The title should capture the main topic. Respond with ONLY the title text, no markdown, no #, just plain text.`;
 
-        const response = await requestUrl({
-            url: 'https://api.anthropic.com/v1/messages',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': this.apiKey,
-                'anthropic-version': '2023-06-01',
-            },
-            body: JSON.stringify({
-                model: this.model,
-                max_tokens: 100,
-                messages: [
-                    {
-                        role: 'user',
-                        content: `${systemPrompt}\n\nContent:\n${content.slice(0, 2000)}`,
-                    },
-                ],
-            }),
-        });
-
-        if (response.status !== 200) {
-            throw new Error(`API error: ${response.status}`);
-        }
-
-        const title = getResponseText(response.json);
-
-        if (!title || typeof title !== 'string') {
-            throw new Error('Empty response from API');
-        }
-
-        return title.trim();
+        const text = await this.postChat(systemPrompt, `Content:\n${content.slice(0, 2000)}`);
+        return text.trim();
     }
 }
