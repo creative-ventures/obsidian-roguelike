@@ -182,7 +182,7 @@ export class AIContentPreviewModal extends Modal {
         previewSection.createEl('h4', { text: 'Preview' });
         
         const previewContainer = previewSection.createDiv('rlc-content-preview');
-        MarkdownRenderer.render(
+        void MarkdownRenderer.render(
             this.app,
             this.content,
             previewContainer,

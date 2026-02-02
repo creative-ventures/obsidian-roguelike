@@ -194,7 +194,7 @@ export default class RoguelikePlugin extends Plugin {
     // Create goal with AI (with tree context)
     private async createGoalWithAI() {
         if (!this.aiService.isConfigured()) {
-            new Notice('Please configure Claude API key in settings');
+            new Notice('Please add your API key in settings');
             return;
         }
 
@@ -315,7 +315,7 @@ export default class RoguelikePlugin extends Plugin {
     // Generate map
     private async generateMap() {
         if (!this.aiService.isConfigured()) {
-            new Notice('Please configure Claude API key in settings');
+            new Notice('Please add your API key in settings');
             return;
         }
 
@@ -368,7 +368,7 @@ export default class RoguelikePlugin extends Plugin {
     // Generate chart
     private async generateChart() {
         if (!this.aiService.isConfigured()) {
-            new Notice('Please configure Claude API key in settings');
+            new Notice('Please add your API key in settings');
             return;
         }
 
@@ -416,7 +416,7 @@ export default class RoguelikePlugin extends Plugin {
     // Prompt (update note content) - works with selection or whole note
     private async promptNoteContent() {
         if (!this.aiService.isConfigured()) {
-            new Notice('Please configure Claude API key in settings');
+            new Notice('Please add your API key in settings');
             return;
         }
 
@@ -492,7 +492,7 @@ Write concise, actionable content in markdown format.`;
     // Generate header (H1 always)
     private async generateHeader() {
         if (!this.aiService.isConfigured()) {
-            new Notice('Please configure Claude API key in settings');
+            new Notice('Please add your API key in settings');
             return;
         }
 
@@ -554,7 +554,7 @@ Write concise, actionable content in markdown format.`;
                             await this.app.fileManager.renameFile(activeFile, newPath);
                             new Notice(`Header set and file renamed to "${result.content}"`);
                         } catch {
-                            new Notice('Header set! (Could not rename file)');
+                            new Notice('Header set! (could not rename file)');
                         }
                     }
                     return;

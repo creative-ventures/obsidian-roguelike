@@ -16,10 +16,9 @@ export class RoguelikeSettingTab extends PluginSettingTab {
         containerEl.empty();
 
         new Setting(containerEl)
-            .setName('Roguelike settings')
+            .setName('Theme')
             .setHeading();
 
-        // Theme
         new Setting(containerEl)
             .setName('Theme')
             .setDesc('Visual theme for messages and achievements')
@@ -29,16 +28,15 @@ export class RoguelikeSettingTab extends PluginSettingTab {
                     dropdown.addOption(theme, this.formatThemeName(theme));
                 }
                 dropdown.setValue(this.plugin.settings.theme);
-                dropdown.onChange(async (value) => {
+                dropdown.onChange((value) => {
                     this.plugin.settings.theme = value as ThemeName;
-                    await this.plugin.saveSettings();
-                    this.plugin.updateTheme();
+                    void this.plugin.saveSettings().then(() => this.plugin.updateTheme());
                 });
             });
 
-        // AI Settings section
+        // API section
         new Setting(containerEl)
-            .setName('AI settings')
+            .setName('API key')
             .setHeading();
 
         new Setting(containerEl)
@@ -46,12 +44,11 @@ export class RoguelikeSettingTab extends PluginSettingTab {
             .setDesc('API key for AI-powered features')
             .addText((text) =>
                 text
-                    .setPlaceholder('sk-ant-...')
+                    .setPlaceholder('Paste your API key here')
                     .setValue(this.plugin.settings.aiApiKey)
-                    .onChange(async (value) => {
+                    .onChange((value) => {
                         this.plugin.settings.aiApiKey = value;
-                        await this.plugin.saveSettings();
-                        this.plugin.updateAIConfig();
+                        void this.plugin.saveSettings().then(() => this.plugin.updateAIConfig());
                     })
             );
 
@@ -59,14 +56,13 @@ export class RoguelikeSettingTab extends PluginSettingTab {
             .setName('AI model')
             .setDesc('Claude model to use')
             .addDropdown((dropdown) => {
-                dropdown.addOption('claude-sonnet-4-20250514', 'Claude Sonnet 4');
-                dropdown.addOption('claude-opus-4-20250514', 'Claude Opus 4');
-                dropdown.addOption('claude-3-5-sonnet-20241022', 'Claude 3.5 Sonnet');
+                dropdown.addOption('claude-sonnet-4-20250514', 'Claude sonnet 4');
+                dropdown.addOption('claude-opus-4-20250514', 'Claude opus 4');
+                dropdown.addOption('claude-3-5-sonnet-20241022', 'Claude 3.5 sonnet');
                 dropdown.setValue(this.plugin.settings.aiModel);
-                dropdown.onChange(async (value) => {
+                dropdown.onChange((value) => {
                     this.plugin.settings.aiModel = value;
-                    await this.plugin.saveSettings();
-                    this.plugin.updateAIConfig();
+                    void this.plugin.saveSettings().then(() => this.plugin.updateAIConfig());
                 });
             });
 
@@ -80,7 +76,7 @@ export class RoguelikeSettingTab extends PluginSettingTab {
         const rlcLink = linkPara.createEl('a', { text: 'Roguelike CLI', href: 'https://www.rlc.rocks' });
         rlcLink.setAttr('target', '_blank');
         linkPara.appendText(' | ');
-        const cvLink = linkPara.createEl('a', { text: 'Creative Ventures', href: 'https://www.cv.rocks' });
+        const cvLink = linkPara.createEl('a', { text: 'Creative ventures', href: 'https://www.cv.rocks' });
         cvLink.setAttr('target', '_blank');
     }
 

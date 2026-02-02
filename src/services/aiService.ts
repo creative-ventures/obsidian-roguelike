@@ -1,5 +1,19 @@
 import { requestUrl } from 'obsidian';
 
+// Anthropic API response shape
+interface AnthropicContentBlock {
+    type: string;
+    text?: string;
+}
+interface AnthropicResponse {
+    content?: AnthropicContentBlock[];
+}
+
+function getResponseText(data: unknown): string | undefined {
+    const r = data as AnthropicResponse;
+    return r.content?.[0]?.text;
+}
+
 export interface SchemaNode {
     name: string;
     isBoss?: boolean;
@@ -90,10 +104,9 @@ Rules:
                 };
             }
 
-            const data = response.json;
-            const content = data.content?.[0]?.text;
+            const content = getResponseText(response.json);
 
-            if (!content) {
+            if (!content || typeof content !== 'string') {
                 return {
                     success: false,
                     error: 'Empty response from API',
@@ -102,7 +115,7 @@ Rules:
 
             // Parse JSON from response
             const jsonMatch = content.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) {
+            if (!jsonMatch || !jsonMatch[0]) {
                 return {
                     success: false,
                     error: 'Could not parse JSON from response',
@@ -158,10 +171,9 @@ Rules:
             throw new Error(`API error: ${response.status}`);
         }
 
-        const data = response.json;
-        const content = data.content?.[0]?.text;
+        const content = getResponseText(response.json);
 
-        if (!content) {
+        if (!content || typeof content !== 'string') {
             throw new Error('Empty response from API');
         }
 
@@ -244,15 +256,14 @@ Respond with ONLY the ASCII art, no explanations.`;
             throw new Error(`API error: ${response.status}`);
         }
 
-        const data = response.json;
-        const content = data.content?.[0]?.text;
+        const content = getResponseText(response.json);
 
-        if (!content) {
+        if (!content || typeof content !== 'string') {
             throw new Error('Empty response from API');
         }
 
         // Extract just the ASCII art (remove any markdown code blocks)
-        let map = content.replace(/```[a-z]*\n?/gi, '').replace(/```/g, '').trim();
+        const map = content.replace(/```[a-z]*\n?/gi, '').replace(/```/g, '').trim();
         
         return map;
     }
@@ -322,15 +333,14 @@ Respond with ONLY the ASCII art, no explanations.`;
             throw new Error(`API error: ${response.status}`);
         }
 
-        const data = response.json;
-        const content = data.content?.[0]?.text;
+        const content = getResponseText(response.json);
 
-        if (!content) {
+        if (!content || typeof content !== 'string') {
             throw new Error('Empty response from API');
         }
 
         // Extract just the ASCII art
-        let chart = content.replace(/```[a-z]*\n?/gi, '').replace(/```/g, '').trim();
+        const chart = content.replace(/```[a-z]*\n?/gi, '').replace(/```/g, '').trim();
         
         return chart;
     }
@@ -373,10 +383,9 @@ Respond with ONLY the ASCII art, no explanations.`;
             throw new Error(`API error: ${response.status}`);
         }
 
-        const data = response.json;
-        const title = data.content?.[0]?.text;
+        const title = getResponseText(response.json);
 
-        if (!title) {
+        if (!title || typeof title !== 'string') {
             throw new Error('Empty response from API');
         }
 
