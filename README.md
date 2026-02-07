@@ -141,7 +141,7 @@ Unlock achievements as you progress:
 
 | Setting | Description |
 |---------|-------------|
-| **Theme** | Visual theme for messages and item names |
+| **Theme** | Text style for messages, achievements, and loot names |
 | **Provider** | AI provider for goals, maps, content, and headers |
 | **Model** | Model to use (depends on selected provider) |
 | **API key** | API key for the selected provider (get it from the provider’s console) |
@@ -191,7 +191,7 @@ npm run lint
 
 - [GitHub Repository](https://github.com/creative-ventures/obsidian-roguelike)
 - [Report Issues](https://github.com/creative-ventures/obsidian-roguelike/issues)
-- [RLC Project](https://www.rlc.rocks)
+- [Roguelike website](https://www.rlc.rocks)
 - [Creative Ventures](https://www.cv.rocks)
 
 ## License
