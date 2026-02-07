@@ -172,3 +172,44 @@
     border-radius: 4px;
     font-size: 12px;
 }
+
+.rlc-settings-group .setting-item {
+    position: relative;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+}
+
+.rlc-settings-group .setting-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: var(--size-4-4);
+    right: var(--size-4-4);
+    height: 1px;
+    background: var(--background-modifier-border);
+}
+
+.rlc-settings-group .setting-item:first-child {
+    border-radius: var(--radius-m) var(--radius-m) 0 0 !important;
+}
+
+.rlc-settings-group .setting-item:last-child {
+    border-radius: 0 0 var(--radius-m) var(--radius-m) !important;
+}
+
+.rlc-settings-links {
+    padding: 0 var(--size-4-4);
+    font-size: var(--font-ui-medium);
+}
+
+.rlc-settings-links ul {
+    list-style: disc;
+    margin: 0;
+    padding-left: 1.5em;
+}
+
+.rlc-settings-links li {
+    margin-bottom: 4px;
+}

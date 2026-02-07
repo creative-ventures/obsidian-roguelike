@@ -21,7 +21,7 @@ export class RoguelikeSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Theme')
-            .setDesc('Visual theme for messages and achievements')
+            .setDesc('Text style for messages, achievements, and loot names')
             .addDropdown((dropdown) => {
                 const themes = getAvailableThemes();
                 for (const theme of themes) {
@@ -39,7 +39,9 @@ export class RoguelikeSettingTab extends PluginSettingTab {
             .setName('API key')
             .setHeading();
 
-        new Setting(containerEl)
+        const apiGroup = containerEl.createDiv({ cls: 'rlc-settings-group' });
+
+        new Setting(apiGroup)
             .setName('Provider')
             .setDesc('AI provider for goals, maps, content, and headers')
             .addDropdown((dropdown) => {
@@ -64,7 +66,7 @@ export class RoguelikeSettingTab extends PluginSettingTab {
                 });
             });
 
-        new Setting(containerEl)
+        new Setting(apiGroup)
             .setName('Model')
             .setDesc('Model to use for the selected provider')
             .addDropdown((dropdown) => {
@@ -79,9 +81,9 @@ export class RoguelikeSettingTab extends PluginSettingTab {
                 });
             });
 
-        new Setting(containerEl)
+        new Setting(apiGroup)
             .setName('API key')
-            .setDesc('API key for the selected provider (get it from the provider’s console)')
+            .setDesc('API key for the selected provider (get it from the provider\'s console)')
             .addText((text) =>
                 text
                     .setPlaceholder('Paste your API key here')
@@ -96,13 +98,20 @@ export class RoguelikeSettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .setName('Links')
             .setHeading();
-        
-        const linksEl = containerEl.createDiv();
-        const linkPara = linksEl.createEl('p');
-        const rlcLink = linkPara.createEl('a', { text: 'Roguelike CLI', href: 'https://www.rlc.rocks' });
+
+        const linksEl = containerEl.createDiv({ cls: 'rlc-settings-links' });
+        const linksList = linksEl.createEl('ul');
+
+        const li1 = linksList.createEl('li');
+        const ghLink = li1.createEl('a', { text: 'GitHub', href: 'https://github.com/creative-ventures/obsidian-roguelike' });
+        ghLink.setAttr('target', '_blank');
+
+        const li2 = linksList.createEl('li');
+        const rlcLink = li2.createEl('a', { text: 'Roguelike website', href: 'https://www.rlc.rocks' });
         rlcLink.setAttr('target', '_blank');
-        linkPara.appendText(' | ');
-        const cvLink = linkPara.createEl('a', { text: 'Creative ventures', href: 'https://www.cv.rocks' });
+
+        const li3 = linksList.createEl('li');
+        const cvLink = li3.createEl('a', { text: 'Creative ventures', href: 'https://www.cv.rocks' });
         cvLink.setAttr('target', '_blank');
     }
 
