@@ -34,10 +34,16 @@ https://github.com/creative-ventures/obsidian-roguelike/assets/29356955/2eed70c9
 
 ### AI-Powered Planning
 - **Goal Generation** — Describe your project, AI creates a structured task breakdown
-- **Smart Maps** — Generate ASCII dungeon maps visualizing your goal structure
-- **Charts & Diagrams** — Create ASCII schemas for any concept
+- **Smart Maps** — Generate ASCII dungeon maps with labeled rooms showing task names, bosses, deadlines, and blockers
+- **Charts & Diagrams** — Create wide ASCII schemas for any concept
 - **Content Assistant** — AI helps fill notes with relevant content
 - **Auto Headers** — Generate titles and rename files based on content
+
+### Visual Task Status
+- **[DONE] prefix** — Completed goals get `[DONE]` prefix on folder and file names automatically
+- **[BOSS] prefix** — Boss goals get `[BOSS]` prefix on both folder and file
+- **Dimmed in explorer** — Completed tasks appear faded and struck-through in the file navigator
+- **Undo-friendly** — Reopening a goal removes the `[DONE]` prefix automatically
 
 ### Flexible Structure
 - Goals are folders with companion `.md` notes containing metadata
@@ -97,12 +103,12 @@ Each goal is a folder with a companion Markdown note:
 
 ```
 My Project/
-├── My Project.md          # Goal metadata
+├── My Project.md              # Goal metadata
 ├── Research Phase/
 │   ├── Research Phase.md
-│   └── Gather Sources/
-│       └── Gather Sources.md
-└── [BOSS] Launch Day/     # Boss goals have [BOSS] prefix
+│   └── [DONE] Gather Sources/         # Completed goals get [DONE] prefix
+│       └── [DONE] Gather Sources.md
+└── [BOSS] Launch Day/                 # Boss goals have [BOSS] prefix
     └── [BOSS] Launch Day.md
 ```
 

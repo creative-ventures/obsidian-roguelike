@@ -213,3 +213,25 @@
 .rlc-settings-links li {
     margin-bottom: 4px;
 }
+
+/* ============================================
+   [DONE] folders in file explorer
+   ============================================ */
+
+.nav-folder-title[data-path*="[DONE]"] {
+    opacity: 0.45;
+}
+
+.nav-folder-title[data-path*="[DONE]"] .nav-folder-title-content {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.nav-file-title[data-path*="[DONE]"] {
+    opacity: 0.45;
+}
+
+.nav-file-title[data-path*="[DONE]"] .nav-file-title-content {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}

@@ -230,7 +230,7 @@ export default class RoguelikePlugin extends Plugin {
                 return;
             }
 
-            const { newStatus, config } = result;
+            const { newStatus, config, newPath } = result;
             const dict = getDictionary(this.settings.theme);
             const depth = this.noteService.calculateDepth(activeFile.parent?.path || '');
 
@@ -245,7 +245,7 @@ export default class RoguelikePlugin extends Plugin {
                 );
 
                 await this.profileService.addUndoEntry(
-                    activeFile.path,
+                    newPath,
                     config.xp,
                     config.isBoss || false
                 );

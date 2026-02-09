@@ -27,6 +27,13 @@ export function generateInlineFields(fields: Record<string, string | number | bo
     return lines.join('\n');
 }
 
+// Strip all prefixes ([DONE], [BOSS]) from a folder/file name
+export function stripPrefixes(name: string): string {
+    return name
+        .replace(/^\[DONE\]\s*/i, '')
+        .replace(/^\[BOSS\]\s*/i, '');
+}
+
 export class NoteService {
     constructor(private app: App) {}
 
@@ -44,6 +51,19 @@ export class NoteService {
     getCurrentUser(): string {
         // Try to get from Obsidian metadata or return default
         return 'Me';
+    }
+
+    // Strip all prefixes ([DONE], [BOSS]) from a folder/file name
+    getBaseName(name: string): string {
+        return stripPrefixes(name);
+    }
+
+    // Build a prefixed name from base name and flags. Order: [DONE] [BOSS] Name
+    buildPrefixedName(baseName: string, isDone: boolean, isBoss: boolean): string {
+        let name = baseName;
+        if (isBoss) name = `[BOSS] ${name}`;
+        if (isDone) name = `[DONE] ${name}`;
+        return name;
     }
 
     // Create safe folder name - sentence case with spaces
@@ -162,9 +182,9 @@ export class NoteService {
             const content = await this.app.vault.read(file);
             const fields = parseInlineFields(content);
 
-            // Extract name from H1
+            // Extract name from H1 (fallback: file basename without prefixes)
             const nameMatch = content.match(/^#\s+(.+)$/m);
-            const name = (nameMatch && nameMatch[1]) ? nameMatch[1] : file.basename;
+            const name = (nameMatch && nameMatch[1]) ? nameMatch[1] : this.getBaseName(file.basename);
 
             // Extract description
             const descMatch = content.match(/## Description\n\n([\s\S]*?)(?=\n## |$)/);
@@ -181,7 +201,7 @@ export class NoteService {
             const deadline = fields.deadline && fields.deadline !== 'not set' ? fields.deadline : undefined;
 
             return {
-                name: name || file.basename,
+                name: name || this.getBaseName(file.basename),
                 status: (fields.status as GoalStatus) || 'open',
                 deadline,
                 completedAt: fields.completed ? `${fields.completed}T00:00:00.000Z` : undefined,
@@ -226,8 +246,55 @@ export class NoteService {
         await this.app.vault.modify(file, newContent);
     }
 
+    // Rename goal folder AND file inside to match prefixed name
+    async renameGoalFolderAndFile(
+        notePath: string,
+        isDone: boolean,
+        isBoss: boolean
+    ): Promise<string> {
+        const file = this.app.vault.getAbstractFileByPath(notePath);
+        if (!(file instanceof TFile)) return notePath;
+
+        const folder = file.parent;
+        if (!folder) return notePath;
+
+        const baseName = this.getBaseName(folder.name);
+        const newName = this.buildPrefixedName(baseName, isDone, isBoss);
+
+        if (folder.name === newName) return notePath;
+
+        // 1. Rename folder
+        const newFolderPath = folder.parent
+            ? `${folder.parent.path}/${newName}`
+            : newName;
+
+        try {
+            await this.app.fileManager.renameFile(folder, newFolderPath);
+        } catch (e) {
+            console.error('Failed to rename folder:', e);
+            return notePath;
+        }
+
+        // 2. Rename file inside to match folder name
+        const oldFileName = file.name;
+        const newFileName = `${newName}.md`;
+
+        if (oldFileName !== newFileName) {
+            const renamedFile = this.app.vault.getAbstractFileByPath(`${newFolderPath}/${oldFileName}`);
+            if (renamedFile instanceof TFile) {
+                try {
+                    await this.app.fileManager.renameFile(renamedFile, `${newFolderPath}/${newFileName}`);
+                } catch (e) {
+                    console.error('Failed to rename file:', e);
+                }
+            }
+        }
+
+        return `${newFolderPath}/${newFileName}`;
+    }
+
     // Toggle goal status (done/open)
-    async toggleGoalStatus(notePath: string): Promise<{ newStatus: GoalStatus; config: GoalConfig } | null> {
+    async toggleGoalStatus(notePath: string): Promise<{ newStatus: GoalStatus; config: GoalConfig; newPath: string } | null> {
         const config = await this.parseGoalNote(notePath);
         if (!config) return null;
 
@@ -239,11 +306,18 @@ export class NoteService {
             completedAt,
         });
 
-        return { newStatus, config: { ...config, status: newStatus, completedAt } };
+        // Rename folder and file with [DONE] prefix
+        const newPath = await this.renameGoalFolderAndFile(
+            notePath,
+            newStatus === 'done',
+            config.isBoss || false
+        );
+
+        return { newStatus, config: { ...config, status: newStatus, completedAt }, newPath };
     }
 
     // Toggle boss status
-    async toggleBossStatus(notePath: string): Promise<{ isBoss: boolean; config: GoalConfig } | null> {
+    async toggleBossStatus(notePath: string): Promise<{ isBoss: boolean; config: GoalConfig; newPath: string } | null> {
         const config = await this.parseGoalNote(notePath);
         if (!config) return null;
 
@@ -259,27 +333,14 @@ export class NoteService {
             xp: newXP,
         });
 
-        // Rename folder if needed
-        const folder = file.parent;
-        if (folder) {
-            const oldFolderName = folder.name;
-            const baseName = oldFolderName.replace(/^\[BOSS\]\s*/i, '');
-            const newFolderName = newIsBoss ? `[BOSS] ${baseName}` : baseName;
+        // Rename folder and file with correct prefixes
+        const newPath = await this.renameGoalFolderAndFile(
+            notePath,
+            config.status === 'done',
+            newIsBoss
+        );
 
-            if (oldFolderName !== newFolderName) {
-                const newFolderPath = folder.parent 
-                    ? `${folder.parent.path}/${newFolderName}` 
-                    : newFolderName;
-                
-                try {
-                    await this.app.fileManager.renameFile(folder, newFolderPath);
-                } catch (e) {
-                    console.error('Failed to rename folder:', e);
-                }
-            }
-        }
-
-        return { isBoss: newIsBoss, config: { ...config, isBoss: newIsBoss, xp: newXP } };
+        return { isBoss: newIsBoss, config: { ...config, isBoss: newIsBoss, xp: newXP }, newPath };
     }
 
     // Calculate depth from path
@@ -354,7 +415,7 @@ export class NoteService {
                 (f): f is TFile => f instanceof TFile && f.extension === 'md'
             );
 
-            let displayName = child.name.replace(/^\[BOSS\]-/i, '');
+            let displayName = this.getBaseName(child.name);
             const tags: string[] = [];
 
             if (noteFile) {
@@ -363,7 +424,10 @@ export class NoteService {
                     displayName = config.name;
                     if (config.status === 'done') tags.push('DONE');
                     if (config.isBoss) tags.push('BOSS');
-                    if (config.deadline && config.deadline !== 'not set') tags.push(config.deadline);
+                    if (config.deadline && config.deadline !== 'not set') tags.push(`deadline:${config.deadline}`);
+                    if (config.blockedBy && config.blockedBy.length > 0) {
+                        tags.push(`blocked-by:${config.blockedBy.join(',')}`);
+                    }
                 }
             }
 

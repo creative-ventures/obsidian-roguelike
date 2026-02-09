@@ -2,6 +2,7 @@ import { App, TFile, TFolder } from 'obsidian';
 import { Profile, Dictionary, LootItem, Rarity, GoalStatus } from '../types';
 import { xpToNextLevel } from './profileService';
 import { getRaritySymbol } from './lootService';
+import { stripPrefixes } from './noteService';
 
 export const WELCOME_NOTE_NAME = 'Welcome to Roguelike.md';
 
@@ -130,7 +131,7 @@ No active tasks. Use Cmd+Shift+G to create goals!
                         const nameMatch = content.match(/^#\s+(.+)$/m);
                         
                         tasks.push({
-                            name: (nameMatch && nameMatch[1]) || noteFile.basename,
+                            name: (nameMatch && nameMatch[1]) || stripPrefixes(noteFile.basename),
                             status: (fields.status as GoalStatus) || 'open',
                             deadline: fields.deadline !== 'not set' ? fields.deadline : undefined,
                             blocker: fields.blocker && fields.blocker !== 'none' 

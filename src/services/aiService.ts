@@ -239,30 +239,37 @@ Rules:
             throw new Error('API key not configured');
         }
 
-        const systemPrompt = `You are a dungeon map artist for a roguelike game. Create an ASCII dungeon map that looks like a real game level.
+        const systemPrompt = `You are a dungeon map artist for a roguelike game. Create an ASCII dungeon map that looks like a REAL GAME LEVEL and represents the actual task tree.
 
-WIDTH: 60-70 characters max (fits on screen but allows side-by-side rooms)
+STRICT WIDTH LIMIT: NEVER exceed 95 characters per line. Aim for 80-95 chars. Truncate or abbreviate task names to fit. This is a HARD constraint — every single line must be ≤95 chars.
 
-STYLE: Make it look like a real dungeon/game map with:
-- Multiple rooms connected by corridors
-- Rooms can be side by side (not just vertical)
-- Interesting shapes (L-shaped, T-shaped rooms)
-- Secret passages, treasure rooms
-- Different room sizes based on importance
-- Boss rooms should be larger and more decorated
+DUNGEON STYLE (this is the priority — make it look like a real roguelike map!):
+- Multiple rooms connected by corridors (░░░ or ...)
+- Rooms built with walls: █ or # for solid walls
+- Interesting room shapes: L-shaped, T-shaped, large halls
+- Side-by-side rooms, not just vertical
+- Secret passages, dead ends, treasure alcoves
+- ≈ water/hazards in some corridors
+- ♦ treasure in small side rooms
 
-SYMBOLS:
-█ or # for walls
-░ for floor/corridors  
-+ for doors
-* open tasks
-x completed [DONE]
-@ boss [BOSS] (in decorated rooms)
-! blocked
-♦ treasure/loot
-≈ water/hazard
+TASK MAPPING (label each room with real task info):
+- Every task from the tree = one room on the map
+- Write the task name INSIDE its room (abbreviate if long)
+- * before open task names, x before completed [DONE] tasks
+- @ for boss tasks [BOSS] — give them the BIGGEST, most decorated rooms (double walls ╔═╗║╚═╝)
+- ! for blocked tasks — put them behind locked doors
+- If a task has a deadline, show date in the room
+- Parent→child = corridor connecting rooms
+- Blocked-by = locked passage (! symbol on door)
+- Deeper tasks = deeper in the dungeon
 
-Make the map INTERESTING and GAME-LIKE. Use creativity!
+EXAMPLE ROOMS:
+  ╔═══════════════════════╗       ████████████████
+  ║ @ Deploy to prod      ║       █ * Setup CI   █
+  ║   BOSS  2026-03-01    ║       █              █
+  ╚═══════════════════════╝       ████████████████
+
+Make the map ATMOSPHERIC and GAME-LIKE first, then informative.
 Respond with ONLY the ASCII art, no explanations.`;
 
         const content = await this.postChat(systemPrompt, `Task tree:\n${treeContent}`);
@@ -274,16 +281,17 @@ Respond with ONLY the ASCII art, no explanations.`;
             throw new Error('API key not configured');
         }
 
-        const systemPrompt = `You are a diagram artist. Create a COMPACT ASCII art chart/diagram.
+        const systemPrompt = `You are a diagram artist. Create an ASCII art chart/diagram.
 
-IMPORTANT: Keep the diagram NARROW - max 50 characters wide to fit on screen.
+STRICT WIDTH LIMIT: NEVER exceed 80 characters per line. Aim for 65-80 chars. This is a HARD constraint — every single line must be ≤80 chars.
 
 Use box-drawing characters and symbols:
 ┌ ┐ └ ┘ ─ │ ├ ┤ ┬ ┴ ┼ for boxes
-→ ← ↑ ↓ for arrows
+→ ← ↑ ↓ for arrows and flow direction
 * + - for bullet points
+═ ║ ╔ ╗ ╚ ╝ for emphasized boxes
 
-Keep it: MAX WIDTH 50 characters, vertical layout preferred, clear and readable.
+Keep it: clear, readable, use vertical layout when it helps but allow horizontal layout for parallel items.
 Respond with ONLY the ASCII art, no explanations.`;
 
         const content = await this.postChat(systemPrompt, `Create a chart for:\n${prompt}`);
